@@ -2,6 +2,7 @@ package com.sg0101.app.qrcodereader
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_CODE = 1
     private val PERMISSIONS_REQUIRED = arrayOf(Manifest.permission.CAMERA)
+    private var isDetected = false
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -36,6 +38,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             startCamera()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isDetected = false
     }
 
     override fun onRequestPermissionsResult(
@@ -84,11 +91,18 @@ class MainActivity : AppCompatActivity() {
         val imageAnalysis = ImageAnalysis.Builder().build()
 
         imageAnalysis.setAnalyzer(cameraExecutor,
-        QRCodeAnalyzer(object : OnDetectListener {
-            override fun onDetect(msg: String) {
-                Toast.makeText(this@MainActivity, "${msg}", Toast.LENGTH_SHORT).show()
-            }
-        }))
+            QRCodeAnalyzer(object : OnDetectListener {
+                override fun onDetect(msg: String) {
+                    if (!isDetected) {
+                        isDetected = true
+
+                        val intent = Intent(this@MainActivity, ResultActivity::class.java)
+                        intent.putExtra("msg", msg)
+                        startActivity(intent)
+                    }
+                }
+            })
+        )
 
         return imageAnalysis
     }
