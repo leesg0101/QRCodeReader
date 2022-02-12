@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <androidx.camera.view.PreviewView
-        android:id="@+id/carcode_preview"
+        android:id="@+id/barcode_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
